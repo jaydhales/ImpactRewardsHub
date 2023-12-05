@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.20;
 import "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
-import {ImpactToken} from "./ImpactDAOToken.sol";
+import {ImpactDAOToken} from "./ImpactDAOToken.sol";
 import "./ImpactRewardToken.sol";
 
 interface ISoulNft {
@@ -18,8 +18,10 @@ contract ImpactDAO {
 
     uint public id;
     uint votingTime;
+    uint _time;
+    address admin;
     ISoulNft soulnft;
-    ImpactToken token;
+    ImpactDAOToken token;
     ImpactRewardsToken impactrewards;
    
     struct ImpactRewardee {
@@ -47,7 +49,7 @@ contract ImpactDAO {
         Approved
     }
     
-
+    Status public status;
     mapping(uint => ImpactRewardee) impactrewardee;
     mapping(uint => DAOTime) public daotime;
     mapping(address => uint) memberVotes;
@@ -58,11 +60,14 @@ contract ImpactDAO {
     error NotDAOMember();
     error OnlyAdmin();
     error NotYetTime();
+    error VotingInProgress();
 
-    event CreateImpact(id, _title, _noOfImpacts, _location, _description, _imageUrl);
-    event Vote(address member, _id);
+    event CreateImpact(uint _id, string _title, uint _noOfImpacts,string _location, string _description,  string _imageUrl);
+    event Vote(address member, uint _id);
+    event ApproveImpact(uint _id);
+    event MemberRemoved(uint id_);
 
-    constructor (address _address, address _ImpactDAOToken, address _ImpactRewardToken) public {
+    constructor (address _address, address _ImpactDAOToken, address _ImpactRewardToken) {
         admin = _address;
         soulnft = ISoulNft(_ImpactDAOToken);
         impactrewards = ImpactRewardsToken(_ImpactRewardToken);
@@ -86,7 +91,7 @@ contract ImpactDAO {
         impact.owner = msg.sender;
         time.daovotetime = votingTime + block.timestamp;
 
-        emit CreateImpact(id, _title, _noOfImpacts, _location, _description, _imageUrl);
+        emit CreateImpact(_id, _title, _noOfImpacts, _location, _description, _imageUrl);
     }
 
     function vote(uint _id, Votes votes) external {
@@ -95,6 +100,7 @@ contract ImpactDAO {
         if(hasVoted[msg.sender][_id] != false) revert AlreadyVoted();
         if (block.timestamp > daotime[_id].daovotetime) revert VotingTimeElapsed();
         hasVoted[msg.sender][_id] = true;
+        status = Status.Pending;
         uint8 numVotes = 1;
         if (votes == Votes.YAY) {
             impact.yayvotes += numVotes;
@@ -125,16 +131,31 @@ contract ImpactDAO {
         }
     }
 
-        function calculateReward(uint _ID) public {
-      ImpactRewardee storage impact = impactrewardee[_ID];  
-      require(impact.noOfImpacts > 50, "Impacts have to be greater than 50 to get rewarded");
-      uint reward = impact.noOfImpacts / 5;
-    }
 
     function approveImpact(uint _id) external {
+        if (soulnft.balanceOf(msg.sender) != 1) revert NotDAOMember();
+        if (daotime[_id].daovotetime > block.timestamp)
+            revert VotingInProgress();
         ImpactRewardee storage impact = impactrewardee[_id];
         if(impact.yayvotes > impact.nayvotes) {
-            // impactrewards.Impact(_ID, _title, _description, _location);
+            status = Status.Approved;
         }
+
+        emit ApproveImpact(_id);
     }
+
+
+    function rewardImpact(uint _ID) external {
+        ImpactRewardee storage impact = impactrewardee[_ID];
+        require(status == Status.Approved, "DAO Members has to approve");
+        require(impact.noOfImpacts > 50, "Impacts have to be greater than 50 to get rewarded");
+        uint impactreward = impact.noOfImpacts / 5;
+        impactrewards.mint(msg.sender, impactreward);
+        impactrewards.transfer(msg.sender, impactreward);
+        impactreward = 0;
+    }
+
+    // Marketplace
+
+
 }
