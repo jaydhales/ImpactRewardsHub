@@ -14,8 +14,19 @@ interface ISoulNft {
     function showMembers() external view returns (address[] memory);
 }
 
-contract ImpactDAO {
+struct ImpactRewardee {
+    uint id_;
+    address owner;
+    string title;
+    string description;
+    string location;
+    uint yayvotes;
+    uint nayvotes;
+    uint noOfImpacts;
+    string imageUrl;
+}
 
+contract ImpactDAO {
     uint public id;
     uint votingTime;
     uint _time;
@@ -23,20 +34,8 @@ contract ImpactDAO {
     ISoulNft soulnft;
     ImpactDAOToken token;
     ImpactRewardsToken impactrewards;
-   
-    struct ImpactRewardee {
-        uint id_;
-        address owner;
-        string title;
-        string description;
-        string location;
-        uint yayvotes;
-        uint nayvotes;
-        uint noOfImpacts;
-        string imageUrl;
-    }
 
-    struct DAOTime{
+    struct DAOTime {
         uint daovotetime;
     }
 
@@ -48,7 +47,7 @@ contract ImpactDAO {
         Pending,
         Approved
     }
-    
+
     Status public status;
     mapping(uint => ImpactRewardee) impactrewardee;
     mapping(uint => DAOTime) public daotime;
@@ -62,19 +61,37 @@ contract ImpactDAO {
     error NotYetTime();
     error VotingInProgress();
 
-    event CreateImpact(uint _id, string _title, uint _noOfImpacts,string _location, string _description,  string _imageUrl);
+    event CreateImpact(
+        uint _id,
+        string _title,
+        uint _noOfImpacts,
+        string _location,
+        string _description,
+        string _imageUrl
+    );
     event Vote(address member, uint _id);
     event ApproveImpact(uint _id);
     event MemberRemoved(uint id_);
+    event RewardImpact(uint _id);
 
-    constructor (address _address, address _ImpactDAOToken, address _ImpactRewardToken) {
+    constructor(
+        address _address,
+        address _ImpactDAOToken,
+        address _ImpactRewardToken
+    ) {
         admin = _address;
         soulnft = ISoulNft(_ImpactDAOToken);
         impactrewards = ImpactRewardsToken(_ImpactRewardToken);
         votingTime = 1 days;
     }
 
-    function createImpact(string memory _title, uint _noOfImpacts, string memory _location, string memory _description, string memory _imageUrl) public returns (uint _id) {
+    function createImpact(
+        string memory _title,
+        uint _noOfImpacts,
+        string memory _location,
+        string memory _description,
+        string memory _imageUrl
+    ) public returns (uint _id) {
         id++;
         _id = id;
         if (_id == 1) {
@@ -83,24 +100,33 @@ contract ImpactDAO {
         ImpactRewardee storage impact = impactrewardee[_id];
         DAOTime storage time = daotime[_id];
         impact.id_ = _id;
-        impact.title = _title; 
+        impact.title = _title;
         impact.noOfImpacts = _noOfImpacts;
         impact.location = _location;
         impact.description = _description;
         impact.imageUrl = _imageUrl;
         impact.owner = msg.sender;
         time.daovotetime = votingTime + block.timestamp;
+        status = Status.Pending;
 
-        emit CreateImpact(_id, _title, _noOfImpacts, _location, _description, _imageUrl);
+        emit CreateImpact(
+            _id,
+            _title,
+            _noOfImpacts,
+            _location,
+            _description,
+            _imageUrl
+        );
     }
 
     function vote(uint _id, Votes votes) external {
         if (soulnft.balanceOf(msg.sender) != 1) revert NotDAOMember();
         ImpactRewardee storage impact = impactrewardee[_id];
-        if(hasVoted[msg.sender][_id] != false) revert AlreadyVoted();
-        if (block.timestamp > daotime[_id].daovotetime) revert VotingTimeElapsed();
+        if (hasVoted[msg.sender][_id] != false) revert AlreadyVoted();
+        if (block.timestamp > daotime[_id].daovotetime)
+            revert VotingTimeElapsed();
         hasVoted[msg.sender][_id] = true;
-        status = Status.Pending;
+
         uint8 numVotes = 1;
         if (votes == Votes.YAY) {
             impact.yayvotes += numVotes;
@@ -112,7 +138,7 @@ contract ImpactDAO {
         emit Vote(msg.sender, _id);
     }
 
-     function removeMember() external {
+    function removeMember() external {
         if (msg.sender != admin) revert OnlyAdmin();
         if (_time > block.timestamp) revert NotYetTime();
         _time = block.timestamp + 30 days;
@@ -131,31 +157,30 @@ contract ImpactDAO {
         }
     }
 
-
     function approveImpact(uint _id) external {
         if (soulnft.balanceOf(msg.sender) != 1) revert NotDAOMember();
         if (daotime[_id].daovotetime > block.timestamp)
             revert VotingInProgress();
         ImpactRewardee storage impact = impactrewardee[_id];
-        if(impact.yayvotes > impact.nayvotes) {
+        if (impact.yayvotes > impact.nayvotes) {
             status = Status.Approved;
         }
 
         emit ApproveImpact(_id);
     }
 
-
     function rewardImpact(uint _ID) external {
         ImpactRewardee storage impact = impactrewardee[_ID];
         require(status == Status.Approved, "DAO Members has to approve");
-        require(impact.noOfImpacts > 50, "Impacts have to be greater than 50 to get rewarded");
+        require(
+            impact.noOfImpacts > 50,
+            "Impacts have to be greater than 50 to get rewarded"
+        );
+        require(msg.sender == impact.owner, "Only owner can claim  reward");
         uint impactreward = impact.noOfImpacts / 5;
-        impactrewards.mint(msg.sender, impactreward);
-        impactrewards.transfer(msg.sender, impactreward);
+        impactrewards.mint(impact.owner, impactreward);
         impactreward = 0;
+
+        emit RewardImpact(_ID);
     }
-
-    // Marketplace
-
-
 }
