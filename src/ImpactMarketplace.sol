@@ -15,45 +15,59 @@ interface SoulNft {
 
     function showMembers() external view returns (address[] memory);
 }
-contract ImpactMarketPlace{
 
-    IERC20 private immutable token;
+struct Product {
+    uint256 id;
+    string name;
+    string description;
+    uint256 price;
+    uint256 sold;
+    string image;
+    uint256 availableItems;
+}
+
+contract ImpactMarketPlace {
     uint256 private idCounter;
     SoulNft soulnft;
     ImpactRewardsToken impactrewards;
-    
+
     // we can add admin functionalities...
     // I'm thinking it should be onlyadmin that can upload and edit or dao members, you decide.
 
-    event ProductCreated(uint256 id, string name, string description, uint256 price, string image, uint256 sold, uint256 availableItems);
-    event ProductUpdated(uint id, uint256 price,  uint256 availableItems);
+    event ProductCreated(
+        uint256 id,
+        string name,
+        string description,
+        uint256 price,
+        string image,
+        uint256 sold,
+        uint256 availableItems
+    );
+    event ProductUpdated(uint id, uint256 price, uint256 availableItems);
     event ProductDeleted(uint id);
     event ProductBought(uint id, address buyer, uint256 price, uint quantity);
+    event ProductEdited(uint id, uint256 price, uint256 availableItems);
 
     error NotDAOMember();
 
-    constructor(address _token, address _ImpactDAOToken, address _ImpactRewardToken){
-        token = IERC20( _token);
+    constructor(address _ImpactDAOToken, address _ImpactRewardToken) {
         soulnft = SoulNft(_ImpactDAOToken);
         impactrewards = ImpactRewardsToken(_ImpactRewardToken);
     }
 
-    struct Product{
-        uint256 id;
-        string name;
-        string description;
-        uint256 price;
-        uint256 sold;
-        string image;
-        uint256 availableItems;
-    }
-
     mapping(uint256 => Product) private products;
-    function uploadProduct(string memory _name, string memory _description, uint256 _price, string memory _image, uint256 available) external payable{
+
+    function uploadProduct(
+        string memory _name,
+        string memory _description,
+        uint256 _price,
+        string memory _image,
+        uint256 available
+    ) external payable {
         if (soulnft.balanceOf(msg.sender) != 1) revert NotDAOMember();
         uint256 id = idCounter++;
-        require(_price > 0);
-        require(available > 0);
+        require(_price > 0, "Product price must be greater than 0");
+        require(available > 0, "Product available must be greater than 0");
 
         Product storage p = products[id];
         p.id = id;
@@ -64,33 +78,49 @@ contract ImpactMarketPlace{
         p.sold = 0;
         p.availableItems = available;
 
-        emit ProductCreated(id, _name, _description, _price, _image, 0, available);
+        emit ProductCreated(
+            id,
+            _name,
+            _description,
+            _price,
+            _image,
+            0,
+            available
+        );
     }
 
-
-    function editProduct(uint256 id,uint256 _price, uint256 available) external{
+    function editProduct(
+        uint256 id,
+        uint256 _price,
+        uint256 available
+    ) external {
+        if (soulnft.balanceOf(msg.sender) != 1) revert NotDAOMember();
         Product storage p = products[id];
         p.price = _price;
         p.availableItems = available;
+
+        emit ProductEdited(id, _price, available);
     }
 
-    function deleteProduct(uint256 id) external{
+    function deleteProduct(uint256 id) external {
+        if (soulnft.balanceOf(msg.sender) != 1) revert NotDAOMember();
         delete products[id];
+        emit ProductDeleted(id);
     }
 
-    function buyProduct(uint256 id, uint256 quantity) external payable{
+    function buyProduct(uint256 id, uint256 quantity) external payable {
         require(id <= idCounter, "Invalid Product ID");
         Product storage p = products[id];
         uint quantityPrice = p.price * quantity;
-        require(impactrewards.balanceOf(msg.sender) >= quantityPrice, "Not Enough Impact rewards token");
+        require(
+            impactrewards.balanceOf(msg.sender) >= quantityPrice,
+            "Not Enough Impact rewards token"
+        );
         require(p.availableItems > 0, "Product not available");
         p.sold++;
         p.availableItems--;
-        impactrewards.transferFrom(msg.sender, address(this), quantityPrice);
-        impactrewards.burn(address(this), quantityPrice);
+        impactrewards.burn(msg.sender, quantityPrice);
 
         emit ProductBought(id, msg.sender, p.price, quantity);
     }
-
-    
 }
