@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
+
 import "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import {ImpactDAOToken} from "./ImpactDAOToken.sol";
 import "./ImpactRewardToken.sol";
@@ -9,34 +10,34 @@ interface ISoulNft {
 
     function burn(uint256 tokenId) external;
 
-    function showIds(address _member) external view returns (uint);
+    function showIds(address _member) external view returns (uint256);
 
     function showMembers() external view returns (address[] memory);
 }
 
 struct ImpactRewardee {
-    uint id_;
+    uint256 id_;
     address owner;
     string title;
     string description;
     string location;
-    uint yayvotes;
-    uint nayvotes;
-    uint noOfImpacts;
+    uint256 yayvotes;
+    uint256 nayvotes;
+    uint256 noOfImpacts;
     string imageUrl;
 }
 
 contract ImpactDAO {
-    uint public id;
-    uint votingTime;
-    uint _time;
+    uint256 public id;
+    uint256 votingTime;
+    uint256 _time;
     address admin;
     ISoulNft soulnft;
     ImpactDAOToken token;
     ImpactRewardsToken impactrewards;
 
     struct DAOTime {
-        uint daovotetime;
+        uint256 daovotetime;
     }
 
     enum Votes {
@@ -49,10 +50,11 @@ contract ImpactDAO {
     }
 
     Status public status;
-    mapping(uint => ImpactRewardee) impactrewardee;
-    mapping(uint => DAOTime) public daotime;
-    mapping(address => uint) memberVotes;
-    mapping(address => mapping(uint => bool)) public hasVoted;
+    mapping(uint256 => ImpactRewardee) impactrewardee;
+    mapping(address => uint256[]) usersImpact;
+    mapping(uint256 => DAOTime) public daotime;
+    mapping(address => uint256) memberVotes;
+    mapping(address => mapping(uint256 => bool)) public hasVoted;
 
     error AlreadyVoted();
     error VotingTimeElapsed();
@@ -62,23 +64,14 @@ contract ImpactDAO {
     error VotingInProgress();
 
     event CreateImpact(
-        uint _id,
-        string _title,
-        uint _noOfImpacts,
-        string _location,
-        string _description,
-        string _imageUrl
+        uint256 _id, string _title, uint256 _noOfImpacts, string _location, string _description, string _imageUrl
     );
-    event Vote(address member, uint _id);
-    event ApproveImpact(uint _id);
-    event MemberRemoved(uint id_);
-    event RewardImpact(uint _id);
+    event Vote(address member, uint256 _id);
+    event ApproveImpact(uint256 _id);
+    event MemberRemoved(uint256 id_);
+    event RewardImpact(uint256 _id);
 
-    constructor(
-        address _address,
-        address _ImpactDAOToken,
-        address _ImpactRewardToken
-    ) {
+    constructor(address _address, address _ImpactDAOToken, address _ImpactRewardToken) {
         admin = _address;
         soulnft = ISoulNft(_ImpactDAOToken);
         impactrewards = ImpactRewardsToken(_ImpactRewardToken);
@@ -87,11 +80,11 @@ contract ImpactDAO {
 
     function createImpact(
         string memory _title,
-        uint _noOfImpacts,
+        uint256 _noOfImpacts,
         string memory _location,
         string memory _description,
         string memory _imageUrl
-    ) public returns (uint _id) {
+    ) public returns (uint256 _id) {
         id++;
         _id = id;
         if (_id == 1) {
@@ -109,22 +102,17 @@ contract ImpactDAO {
         time.daovotetime = votingTime + block.timestamp;
         status = Status.Pending;
 
-        emit CreateImpact(
-            _id,
-            _title,
-            _noOfImpacts,
-            _location,
-            _description,
-            _imageUrl
-        );
+        usersImpact[msg.sender].push(_id);
+        emit CreateImpact(_id, _title, _noOfImpacts, _location, _description, _imageUrl);
     }
 
-    function vote(uint _id, Votes votes) external {
+    function vote(uint256 _id, Votes votes) external {
         if (soulnft.balanceOf(msg.sender) != 1) revert NotDAOMember();
         ImpactRewardee storage impact = impactrewardee[_id];
         if (hasVoted[msg.sender][_id] != false) revert AlreadyVoted();
-        if (block.timestamp > daotime[_id].daovotetime)
+        if (block.timestamp > daotime[_id].daovotetime) {
             revert VotingTimeElapsed();
+        }
         hasVoted[msg.sender][_id] = true;
 
         uint8 numVotes = 1;
@@ -144,23 +132,24 @@ contract ImpactDAO {
         _time = block.timestamp + 30 days;
 
         require(id > 1, "cannot remove");
-        uint removeCriteria = (70 * id) / 100;
+        uint256 removeCriteria = (70 * id) / 100;
         address[] memory m = soulnft.showMembers();
-        for (uint i = 0; i < m.length; i++) {
+        for (uint256 i = 0; i < m.length; i++) {
             address daoMembers = m[i];
 
             if (memberVotes[daoMembers] < removeCriteria) {
-                uint id_ = soulnft.showIds(daoMembers);
+                uint256 id_ = soulnft.showIds(daoMembers);
                 soulnft.burn(id_);
                 emit MemberRemoved(id_);
             }
         }
     }
 
-    function approveImpact(uint _id) external {
+    function approveImpact(uint256 _id) external {
         if (soulnft.balanceOf(msg.sender) != 1) revert NotDAOMember();
-        if (daotime[_id].daovotetime > block.timestamp)
+        if (daotime[_id].daovotetime > block.timestamp) {
             revert VotingInProgress();
+        }
         ImpactRewardee storage impact = impactrewardee[_id];
         if (impact.yayvotes > impact.nayvotes) {
             status = Status.Approved;
@@ -169,18 +158,26 @@ contract ImpactDAO {
         emit ApproveImpact(_id);
     }
 
-    function rewardImpact(uint _ID) external {
+    function rewardImpact(uint256 _ID) external {
         ImpactRewardee storage impact = impactrewardee[_ID];
         require(status == Status.Approved, "DAO Members has to approve");
-        require(
-            impact.noOfImpacts > 50,
-            "Impacts have to be greater than 50 to get rewarded"
-        );
+        require(impact.noOfImpacts > 50, "Impacts have to be greater than 50 to get rewarded");
         require(msg.sender == impact.owner, "Only owner can claim  reward");
-        uint impactreward = impact.noOfImpacts / 5;
+        uint256 impactreward = impact.noOfImpacts / 5;
         impactrewards.mint(impact.owner, impactreward);
         impactreward = 0;
 
         emit RewardImpact(_ID);
+    }
+
+    function getImpacts() external view returns (ImpactRewardee[] memory) {
+        ImpactRewardee[] memory _impactR = new ImpactRewardee[](id);
+        for (uint256 i = 0; i < id; i++) {
+            _impactR[i] = (impactrewardee[i]);
+        }
+    }
+
+    function getUserImpacts(address _user) external view returns (uint256[] memory) {
+        return usersImpact[_user];
     }
 }
