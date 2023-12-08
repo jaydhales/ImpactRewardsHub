@@ -2,7 +2,11 @@
 src = "src"
 out = "out"
 libs = ["lib"]
+solc = "0.8.20"
 
 fs_permissions = [{ access = "read-write", path = "./"}]
+
+[etherscan]
+sepolia = { key = "UKP6J4F2C6AIR225TB9WI84QDX9JD8UYHP" }
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
