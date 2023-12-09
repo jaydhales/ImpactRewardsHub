@@ -27,9 +27,9 @@ struct Product {
 }
 
 contract ImpactMarketPlace {
-    uint256 private idCounter;
-    SoulNft soulnft;
-    ImpactRewardsToken impactrewards;
+    uint256 public idCounter;
+    SoulNft public soulnft;
+    ImpactRewardsToken public impactrewards;
 
     // we can add admin functionalities...
     // I'm thinking it should be onlyadmin that can upload and edit or dao members, you decide.
@@ -49,7 +49,7 @@ contract ImpactMarketPlace {
         impactrewards = ImpactRewardsToken(_ImpactRewardToken);
     }
 
-    mapping(uint256 => Product) private products;
+    mapping(uint256 => Product) public products;
 
     function uploadProduct(
         string memory _name,
@@ -57,7 +57,7 @@ contract ImpactMarketPlace {
         uint256 _price,
         string memory _image,
         uint256 available
-    ) external payable {
+    ) external {
         if (soulnft.balanceOf(msg.sender) != 1) revert NotDAOMember();
         uint256 id = idCounter++;
         require(_price > 0, "Product price must be greater than 0");

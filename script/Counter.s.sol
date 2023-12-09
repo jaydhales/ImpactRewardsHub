@@ -19,7 +19,7 @@ contract CounterScript is Script {
         ImpactDAOToken Token = new ImpactDAOToken(Admin, "token Uri");
         ImpactRewardsToken rewardee = new ImpactRewardsToken();
         ImpactDAO impactDao = new ImpactDAO(Admin, address(Token), address(rewardee));
-        ImpactMarketPlace marketplace = new ImpactMarketPlace(address(impactDao), address(rewardee));
+        ImpactMarketPlace marketplace = new ImpactMarketPlace(address(Token), address(rewardee));
 
         console2.logString("Admin");
         console2.logAddress(Admin);
