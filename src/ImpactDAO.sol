@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {ImpactDAOToken} from "./ImpactDAOToken.sol";
 import "./ImpactRewardToken.sol";
 
@@ -25,6 +25,12 @@ struct ImpactRewardee {
     uint256 nayvotes;
     uint256 noOfImpacts;
     string imageUrl;
+    Status status;
+}
+
+enum Status {
+    Pending,
+    Approved
 }
 
 contract ImpactDAO {
@@ -44,12 +50,7 @@ contract ImpactDAO {
         YAY,
         NAY
     }
-    enum Status {
-        Pending,
-        Approved
-    }
 
-    Status public status;
     mapping(uint256 => ImpactRewardee) impactrewardee;
     mapping(address => uint256[]) usersImpact;
     mapping(uint256 => DAOTime) public daotime;
@@ -100,7 +101,7 @@ contract ImpactDAO {
         impact.imageUrl = _imageUrl;
         impact.owner = msg.sender;
         time.daovotetime = votingTime + block.timestamp;
-        status = Status.Pending;
+        impact.status = Status.Pending;
 
         usersImpact[msg.sender].push(_id);
         emit CreateImpact(_id, _title, _noOfImpacts, _location, _description, _imageUrl);
@@ -152,7 +153,7 @@ contract ImpactDAO {
         }
         ImpactRewardee storage impact = impactrewardee[_id];
         if (impact.yayvotes > impact.nayvotes) {
-            status = Status.Approved;
+            impact.status = Status.Approved;
         }
 
         emit ApproveImpact(_id);
@@ -160,7 +161,7 @@ contract ImpactDAO {
 
     function rewardImpact(uint256 _ID) external {
         ImpactRewardee storage impact = impactrewardee[_ID];
-        require(status == Status.Approved, "DAO Members has to approve");
+        require(impact.status == Status.Approved, "DAO Members has to approve");
         require(impact.noOfImpacts > 50, "Impacts have to be greater than 50 to get rewarded");
         require(msg.sender == impact.owner, "Only owner can claim  reward");
         uint256 impactreward = impact.noOfImpacts / 5;
@@ -170,14 +171,17 @@ contract ImpactDAO {
         emit RewardImpact(_ID);
     }
 
-    function getImpacts() external view returns (ImpactRewardee[] memory) {
-        ImpactRewardee[] memory _impactR = new ImpactRewardee[](id);
+    function getImpacts() external view returns (ImpactRewardee[] memory _impactR) {
+        _impactR = new ImpactRewardee[](id);
         for (uint256 i = 0; i < id; i++) {
-            _impactR[i] = (impactrewardee[i]);
+            _impactR[i] = (impactrewardee[i + 1]);
         }
     }
 
-    function getUserImpacts(address _user) external view returns (uint256[] memory) {
-        return usersImpact[_user];
+    function getUserImpacts(address _user) external view returns (ImpactRewardee[] memory _impactR) {
+        _impactR = new ImpactRewardee[](usersImpact[_user].length);
+        for (uint256 i = 0; i < usersImpact[_user].length; i++) {
+            _impactR[i] = (impactrewardee[usersImpact[_user][i]]);
+        }
     }
 }

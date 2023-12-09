@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
-import "lib/openzeppelin-contracts/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "lib/openzeppelin-contracts/contracts/access/Ownable.sol";
-import "lib/openzeppelin-contracts/contracts/utils/cryptography/MerkleProof.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
 /// @title WildLifeGuardianToken - A unique NFT contract for Wildlife Guardians.
 
@@ -12,7 +12,6 @@ contract ImpactDAOToken is ERC721, ERC721URIStorage, Ownable {
     uint256 private _tokenIdCounter;
     bytes32 public rootHash;
     string tokenUri;
-  
 
     address[] public members;
 
@@ -23,15 +22,12 @@ contract ImpactDAOToken is ERC721, ERC721URIStorage, Ownable {
     /// @dev Mapping to keep track of claimed tokens.
 
     mapping(address => bool) claimed;
-    mapping(address => uint) addressToIds;
+    mapping(address => uint256) addressToIds;
 
     /// @notice Constructor to initialize the contract.
     /// @param _owner The address of the contract owner.
     /// @param _tokenUri The token URI for the new tokens.
-    constructor(
-        address _owner,
-        string memory _tokenUri
-    ) ERC721("Impact Token", "ITK") Ownable(_owner) {
+    constructor(address _owner, string memory _tokenUri) ERC721("Impact Token", "ITK") Ownable(_owner) {
         tokenUri = _tokenUri;
     }
 
@@ -40,7 +36,7 @@ contract ImpactDAOToken is ERC721, ERC721URIStorage, Ownable {
 
     function safeMint(address[] calldata to) public onlyOwner {
         string memory URI = tokenUri;
-        for (uint i = 0; i < to.length; ++i) {
+        for (uint256 i = 0; i < to.length; ++i) {
             if (to[i] == address(0)) {
                 revert InvalidAddress(to[i]);
             }
@@ -61,16 +57,13 @@ contract ImpactDAOToken is ERC721, ERC721URIStorage, Ownable {
     /// @param _account The address claiming the token.
     /// @return true if the claim is successful, false otherwise.
 
-    function claimToken(
-        bytes32[] calldata _merkleProof,
-        address _account
-    ) external returns (bool) {
+    function claimToken(bytes32[] calldata _merkleProof, address _account) external returns (bool) {
         require(_account == msg.sender, "Only owner of account can claim");
         require(balanceOf(_account) == 0, "You already own an nft");
         if (claimed[_account]) {
             revert AlreadyClaimed();
         }
-        bytes32 leaf = keccak256(abi.encodePacked(_account, uint(1)));
+        bytes32 leaf = keccak256(abi.encodePacked(_account, uint256(1)));
         if (!MerkleProof.verify(_merkleProof, rootHash, leaf)) {
             revert NotWhitelisted();
         }
@@ -97,7 +90,7 @@ contract ImpactDAOToken is ERC721, ERC721URIStorage, Ownable {
         _burn(tokenId);
     }
 
-    function showIds(address _member) public view returns (uint) {
+    function showIds(address _member) public view returns (uint256) {
         return addressToIds[_member];
     }
 
@@ -109,27 +102,20 @@ contract ImpactDAOToken is ERC721, ERC721URIStorage, Ownable {
 
     /// @dev Overrides the transferFrom function to disable transfers.
 
-    function transferFrom(
-        address from,
-        address to,
-        uint256 tokenId
-    ) public override(ERC721, IERC721) {
+    function transferFrom(address from, address to, uint256 tokenId) public pure override(ERC721, IERC721) {
+        (from, to, tokenId);
         revert("SoulBoundToken: transfer is disabled");
     }
 
     /// @inheritdoc ERC721
 
-    function tokenURI(
-        uint256 tokenId
-    ) public view override(ERC721, ERC721URIStorage) returns (string memory) {
+    function tokenURI(uint256 tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory) {
         return super.tokenURI(tokenId);
     }
 
     /// @inheritdoc ERC721
 
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view override(ERC721, ERC721URIStorage) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721URIStorage) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 }
