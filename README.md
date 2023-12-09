@@ -1,66 +1,8 @@
-## Foundry
+### ImpactRewardToken Contract Deployd and verified at https://sepolia.etherscan.io/address/0x3aaccc7c02763bffcc01eb6f2958af6fe0a9248b
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
 
-Foundry consists of:
+### ImpactDAOToken Contract deployed and verified at https://sepolia.etherscan.io/address/0x7cd28b73d8afe3219d742178f2660ec3d018a5e4
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+### ImpactMarketplace Contract deployed and verified at https://sepolia.etherscan.io/address/0xea654760768d99a2cf54e37a65200024957ebd5c
 
-## Documentation
-
-https://book.getfoundry.sh/
-
-## Usage
-
-### Build
-
-```shell
-$ forge build
-```
-
-### Test
-
-```shell
-$ forge test
-```
-
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+### ImpactDAO Contract deployed and verified at https://sepolia.etherscan.io/address/0x8a18c466229b0d78ce013314af5505a5ad6924bf

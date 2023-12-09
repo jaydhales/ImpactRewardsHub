@@ -1,4 +1,4 @@
-// // SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.20;
 
@@ -27,12 +27,9 @@ struct Product {
 }
 
 contract ImpactMarketPlace {
-    uint256 private idCounter;
+    uint256 public idCounter;
     SoulNft soulnft;
     ImpactRewardsToken impactrewards;
-
-    // we can add admin functionalities...
-    // I'm thinking it should be onlyadmin that can upload and edit or dao members, you decide.
 
     event ProductCreated(
         uint256 id, string name, string description, uint256 price, string image, uint256 sold, uint256 availableItems
@@ -57,7 +54,7 @@ contract ImpactMarketPlace {
         uint256 _price,
         string memory _image,
         uint256 available
-    ) external payable {
+    ) external {
         if (soulnft.balanceOf(msg.sender) != 1) revert NotDAOMember();
         uint256 id = idCounter++;
         require(_price > 0, "Product price must be greater than 0");
