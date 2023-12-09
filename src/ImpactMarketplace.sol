@@ -102,4 +102,11 @@ contract ImpactMarketPlace {
 
         emit ProductBought(id, msg.sender, p.price, quantity);
     }
+
+    function showProducts() external view returns (Product[] memory _products) {
+        _products = new Product[](idCounter);
+        for (uint256 i = 0; i < idCounter; i++) {
+            _products[i] = products[i + 1];
+        }
+    }
 }

@@ -7,6 +7,8 @@ import "../src/ImpactDAO.sol";
 import "../src/ImpactDAOToken.sol";
 import "../src/ImpactRewardToken.sol";
 
+import "../src/ImpactMarketplace.sol";
+
 contract CounterScript is Script {
     function setUp() public {}
 
@@ -17,16 +19,19 @@ contract CounterScript is Script {
         ImpactDAOToken Token = new ImpactDAOToken(Admin, "token Uri");
         ImpactRewardsToken rewardee = new ImpactRewardsToken();
         ImpactDAO impactDao = new ImpactDAO(Admin, address(Token), address(rewardee));
+        ImpactMarketPlace marketplace = new ImpactMarketPlace(address(impactDao), address(rewardee));
 
-        console2.logAddress(msg.sender);
+        console2.logString("Admin");
         console2.logAddress(Admin);
+        console2.logString("Dao Token");
         console2.logAddress(address(Token));
+        console2.logString("Rewardee Token");
         console2.logAddress(address(rewardee));
+        console2.logString("Dao Contract");
         console2.logAddress(address(impactDao));
+        console2.logString("Marketplace Contract");
+        console2.logAddress(address(marketplace));
 
         vm.stopBroadcast();
     }
 }
-//  0xa2b058528741AFC93631B26F1f71546dAa1B7f34 // TOKEN
-//   0x9e609f87336adf22D19E573417cf00e44Bec194a // REWARD
-//   0xcD81aFBAb25A58381B7DDcC1884839Ea26eAE784 // DAO
