@@ -35,3 +35,5 @@ contract CounterScript is Script {
         vm.stopBroadcast();
     }
 }
+
+// forge script script/Counter.s.sol  --rpc-url https://eth-sepolia.g.alchemy.com/v2/wUESb5BYyxmKb8Tb4ZFejvE369DlO39P --account defaultKey --sender <publickey> --verify   --etherscan-api-key <etherscan-key> --broadcast
