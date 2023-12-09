@@ -1,4 +1,4 @@
-// // SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.20;
 
@@ -30,9 +30,6 @@ contract ImpactMarketPlace {
     uint256 public idCounter;
     SoulNft public soulnft;
     ImpactRewardsToken public impactrewards;
-
-    // we can add admin functionalities...
-    // I'm thinking it should be onlyadmin that can upload and edit or dao members, you decide.
 
     event ProductCreated(
         uint256 id, string name, string description, uint256 price, string image, uint256 sold, uint256 availableItems
