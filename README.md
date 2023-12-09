@@ -1,8 +1,8 @@
-### ImpactRewardToken Contract Deployd and verified at https://sepolia.etherscan.io/address/0x3aaccc7c02763bffcc01eb6f2958af6fe0a9248b
+### ImpactRewardToken Contract Deployd and verified at https://sepolia.etherscan.io/address/0x668062cdb83fdd2871b55d2d43ed539b783e6a67
 
 
-### ImpactDAOToken Contract deployed and verified at https://sepolia.etherscan.io/address/0x7cd28b73d8afe3219d742178f2660ec3d018a5e4
+### ImpactDAOToken Contract deployed and verified at https://sepolia.etherscan.io/address/0xe5935e7f16cc910cf20b6af95bb510beb272595e
 
-### ImpactMarketplace Contract deployed and verified at https://sepolia.etherscan.io/address/0xea654760768d99a2cf54e37a65200024957ebd5c
+### ImpactMarketplace Contract deployed and verified at https://sepolia.etherscan.io/address/0x613f857ad66e1e9983618b28e9c4295b9c1e9e5c
 
-### ImpactDAO Contract deployed and verified at https://sepolia.etherscan.io/address/0x8a18c466229b0d78ce013314af5505a5ad6924bf
+### ImpactDAO Contract deployed and verified at https://sepolia.etherscan.io/address/0x64cfe1121c112e1c7a55522ca0183352bc8c56cc

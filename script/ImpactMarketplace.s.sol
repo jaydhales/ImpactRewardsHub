@@ -10,12 +10,12 @@ contract ImpactMarketplaceScript is Script {
         vm.startBroadcast(deployerPrivateKey);
 
         ImpactMarketPlace marketplace = new ImpactMarketPlace(
-            0x7cD28B73D8AFe3219D742178f2660eC3D018A5E4,
-            0x3aaCcC7C02763BFfCC01EB6F2958aF6FE0a9248B
+            0xE5935E7f16Cc910Cf20B6af95BB510BEB272595e,
+            0x668062cDb83fdd2871b55d2d43eD539B783E6A67
         );
 
         vm.stopBroadcast();
     }
 }
 
-// ImpactMarketplace CONTRACT: 0xeA654760768D99A2cf54E37A65200024957Ebd5c
+// ImpactMarketplace CONTRACT: 0x613f857Ad66e1E9983618B28e9c4295B9C1E9E5c

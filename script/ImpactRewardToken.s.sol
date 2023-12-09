@@ -15,4 +15,4 @@ contract ImpactRewardScript is Script {
     }
 }
 
-// ImpactRewardToken CONTRACT: 0x3aaCcC7C02763BFfCC01EB6F2958aF6FE0a9248B
+// ImpactRewardToken CONTRACT: 0x668062cDb83fdd2871b55d2d43eD539B783E6A67

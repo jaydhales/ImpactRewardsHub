@@ -11,8 +11,8 @@ contract ImpactDAOScript is Script {
 
         ImpactDAO impactdao = new ImpactDAO(
             0xA003A9A2E305Ff215F29fC0b7b4E2bb5a8C2F3e1,
-            0x7cD28B73D8AFe3219D742178f2660eC3D018A5E4,
-            0x3aaCcC7C02763BFfCC01EB6F2958aF6FE0a9248B
+            0xE5935E7f16Cc910Cf20B6af95BB510BEB272595e,
+            0x668062cDb83fdd2871b55d2d43eD539B783E6A67
         );
 
         vm.stopBroadcast();
@@ -20,4 +20,4 @@ contract ImpactDAOScript is Script {
 }
 
 // ADMIN: 0xA003A9A2E305Ff215F29fC0b7b4E2bb5a8C2F3e1
-// ImpactDAO CONTRACT: 0x8a18c466229B0D78cE013314Af5505A5aD6924bF
+// ImpactDAO CONTRACT: 0x64Cfe1121c112E1C7a55522CA0183352BC8C56cC
