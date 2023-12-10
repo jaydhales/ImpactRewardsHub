@@ -18,4 +18,4 @@ contract ImpactMarketplaceScript is Script {
     }
 }
 
-// ImpactMarketplace CONTRACT: 0x613f857Ad66e1E9983618B28e9c4295B9C1E9E5c
+// ImpactMarketplace CONTRACT: 0x6750c20D2dcCBBb5e99Ef6A41Cab11491799992e
