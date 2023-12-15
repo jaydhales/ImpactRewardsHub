@@ -27,7 +27,10 @@ contract ImpactDAOToken is ERC721, ERC721URIStorage, Ownable {
     /// @notice Constructor to initialize the contract.
     /// @param _owner The address of the contract owner.
     /// @param _tokenUri The token URI for the new tokens.
-    constructor(address _owner, string memory _tokenUri) ERC721("Impact Token", "ITK") Ownable(_owner) {
+    constructor(
+        address _owner,
+        string memory _tokenUri
+    ) ERC721("Impact Token", "ITK") Ownable(_owner) {
         tokenUri = _tokenUri;
     }
 
@@ -57,7 +60,10 @@ contract ImpactDAOToken is ERC721, ERC721URIStorage, Ownable {
     /// @param _account The address claiming the token.
     /// @return true if the claim is successful, false otherwise.
 
-    function claimToken(bytes32[] calldata _merkleProof, address _account) external returns (bool) {
+    function claimToken(
+        bytes32[] calldata _merkleProof,
+        address _account
+    ) external returns (bool) {
         require(_account == msg.sender, "Only owner of account can claim");
         require(balanceOf(_account) == 0, "You already own an nft");
         if (claimed[_account]) {
@@ -102,20 +108,28 @@ contract ImpactDAOToken is ERC721, ERC721URIStorage, Ownable {
 
     /// @dev Overrides the transferFrom function to disable transfers.
 
-    function transferFrom(address from, address to, uint256 tokenId) public pure override(ERC721, IERC721) {
+    function transferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public pure override(ERC721, IERC721) {
         (from, to, tokenId);
         revert("SoulBoundToken: transfer is disabled");
     }
 
     /// @inheritdoc ERC721
 
-    function tokenURI(uint256 tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory) {
+    function tokenURI(
+        uint256 tokenId
+    ) public view override(ERC721, ERC721URIStorage) returns (string memory) {
         return super.tokenURI(tokenId);
     }
 
     /// @inheritdoc ERC721
 
-    function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721URIStorage) returns (bool) {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view override(ERC721, ERC721URIStorage) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 }
