@@ -32,6 +32,15 @@ contract CounterScript is Script {
         console2.logString("Marketplace Contract");
         console2.logAddress(address(marketplace));
 
+        address[] memory members = new address[](5);
+        members[0] = Admin;
+        members[1] = 0x764693DD666E8dD9275CDE8F05C6B07446B1d941;
+        members[2] = 0xA003A9A2E305Ff215F29fC0b7b4E2bb5a8C2F3e1;
+        members[3] = 0x30F14795e20d81703304B61835376cF18d7304Bb;
+        members[4] = 0x82f2fBF5617F6D7AfE9AB0C6E5e65dB52D1fb563;
+
+        Token.safeMint(members);
+
         vm.stopBroadcast();
     }
 }
