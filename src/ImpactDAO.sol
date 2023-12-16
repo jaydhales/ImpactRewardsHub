@@ -25,6 +25,7 @@ struct ImpactRewardee {
     uint256 nayvotes;
     uint256 noOfImpacts;
     string imageUrl;
+    bool hasClaimed;
     Status status;
 }
 
@@ -110,6 +111,7 @@ contract ImpactDAO {
         impact.imageUrl = _imageUrl;
         impact.owner = msg.sender;
         time.daovotetime = votingTime + block.timestamp;
+        impact.hasClaimed = false;
         impact.status = Status.Pending;
 
         usersImpact[msg.sender].push(_id);
@@ -178,12 +180,14 @@ contract ImpactDAO {
     function rewardImpact(uint256 _ID) external {
         ImpactRewardee storage impact = impactrewardee[_ID];
         require(impact.status == Status.Approved, "DAO Members has to approve");
+        require(impact.hasClaimed == false, "Already Claimed");
         require(
             impact.noOfImpacts > 50,
             "Impacts have to be greater than 50 to get rewarded"
         );
         require(msg.sender == impact.owner, "Only owner can claim  reward");
-        uint256 impactreward = impact.noOfImpacts / 5;
+        uint256 impactreward = impact.noOfImpacts * (10 ** 15);
+        impact.hasClaimed = true;
         impactrewards.mint(impact.owner, impactreward);
         impactreward = 0;
 
