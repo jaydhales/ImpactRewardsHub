@@ -24,6 +24,21 @@ contract CounterScript is Script {
         console2.logAddress(address(impactDao));
 
         impactDao.resetVoteTime(300);
+        impactDao.createImpact(
+            "Eden Reforestation 3.0",
+            400,
+            "Ikorodu, Lagos State, Nigeria",
+            "Our Goal is to plant trees in Lagos state reserves",
+            "https://f834ca0ad370cc60524088a7152429eb.ipfscdn.io/ipfs/bafybeiaave245ozbxqmwwqbpahqvpp2qcszl5mxgib67ifk664jkhayziy/"
+        );
+
+        impactDao.createImpact(
+            "Plastic Recycling",
+            200,
+            "Mushin, Lagos State, Nigeria",
+            "Plastic recycling reduces the need to extract new, raw materials from the earth as it reuses the stuff that's already processed and protects natural resources. This can help reduce emissions of heat-trapping gases into the atmosphere. It also prevents adding more rubbish to landfills.",
+            "https://f834ca0ad370cc60524088a7152429eb.ipfscdn.io/ipfs/bafybeiblkj5oanytxxo2q3kvnwgc7mho24c4s2xkwege5pugokq3ynwc5y/"
+        );
 
         vm.stopBroadcast();
     }
